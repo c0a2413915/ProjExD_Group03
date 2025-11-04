@@ -36,10 +36,12 @@ class Move_enemy(pg.sprite.Sprite):
         super().__init__()
         self.image = pg.image.load("fig/hati.png")
         self.image = pg.transform.rotozoom(self.image, 0, 0.08)
-        self.rect = self.image.get_rect()
-        self.rect.center = (random.randint(50, WIDTH-50), random.randint(50, HEIGHT-50))
         self.vx = random.choice([-1, 1]) * random.uniform(2, 5)
         self.vy = 1
+        if self.vx < 0: # 向き変更
+            self.image = pg.transform.flip(self.image, True, False)
+        self.rect = self.image.get_rect()
+        self.rect.center = (random.randint(50, WIDTH-50), random.randint(50, HEIGHT-50))
         self.speed = 0.5
 
     def update(self):
@@ -48,8 +50,6 @@ class Move_enemy(pg.sprite.Sprite):
         引数 screen：画面Surface
         """
         self.rect.move_ip(self.speed*self.vx, self.speed*self.vy)
-        # if check_bound(self.rect) != (True, True):
-        #     self.kill()
 
 
 class Attack_effect(pg.sprite.Sprite):
@@ -106,13 +106,13 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
             # クリックで命中判定
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                mx, my = pygame.mouse.get_pos()
+            elif event.type == pg.MOUSEBUTTONDOWN:
+                mx, my = pg.mouse.get_pos()
                 for enemy in enemies:
                     ex, ey = enemy.rect.center
                     distance = ((mx - ex) ** 2 + (my - ey) ** 2) ** 0.5
                     if distance <= enemy.rect.width // 2:
-                        print("hit")
+                        # print("hit")
                         effect = Attack_effect(enemy, 40)
                         effects.add(effect)                   
                         enemy.kill()
